@@ -7,15 +7,25 @@ import datetime
 today = datetime.datetime.today()
 datetime_tag = today.strftime("%Y%m%d")
 
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--tag" , help = "type of sample (data/sig/tprime); need to meet name of directory" , type=str, required = True)
+parser.add_argument("--year" , help = "year: 16, 17, or 18" , type=int, required = True)
+parser.add_argument("--exe" , help = "Execute submission if adding --exe", action = "store_true")
+parser.add_argument("--check_fatal_messages" , help = "Check fatal messages from err files", action = "store_true")
+parser.add_argument("--modify_submission_scripts" , help = "Modify *sh *sub with failed jobs", action = "store_true")
+args = parser.parse_args()
+
 #----------------------------------------------------------------------------------------------------
 # manual options
 #----------------------------------------------------------------------------------------------------
 tag = "tprime"
 tag = "sig"
 tag = "data"
+tag = args.tag
 
 year = 161718
-year = 18
+year = args.year
 
 #----------------------------------------------------------------------------------------------------
 # files
@@ -41,25 +51,13 @@ def check_err_file(target, keyword = "Fatal"):
                 break
     return has_fatal_message
 
-def look_for_fatal_messages():
-    global log
-    with open(log, 'w') as f:
-        targets = glob.glob("dir_%s*/*err" % tag)
-        for target in targets:
-            has_fatal_message = check_err_file(target)
-            if has_fatal_message:
-                f.write(target + '\n')
-
-    print ">>> file(s) with fatal messages are here: %s" % log
-
 def look_for_fatal_messages(txt, keyword = "Fatal"):
+    print ">>> input files: %s" % txt
     global log
-    print txt
     with open(log, 'w') as f:
         with open(txt, 'r') as fin:
             for line in fin.readlines():
                 target = line.strip()
-                print target
                 has_fatal_message = check_err_file(target, keyword)
                 if has_fatal_message:
                     f.write(target + '\n')
@@ -174,6 +172,9 @@ def extract_jobs_to_resubmit(mylist, to_write):
     print ">>> resubmit_list can be found here: %s" % resubmit_list
     subprocess.call('cat %s' % resubmit_list, shell = True)
 
+    if not to_write:
+        raw_input("Press Enter to continue...")
+
 #----------------------------------------------------------------------------------------------------
 
 def resubmit(txt, exe=False):
@@ -193,94 +194,7 @@ def resubmit(txt, exe=False):
 
 #----------------------------------------------------------------------------------------------------
 
-def get_runjob(f, directory, keyword):
-    suffix = "_htc.log"
-    suffix = ".err"
-
-    # check complete jobs (has summary & no fatal messages)
-    list_all_jobs = []
-    list_complete = []
-    err_files = glob.glob("%s/*%d*%s" % (directory, keyword, suffix))
-    for err in err_files:
-        # dir_data_16/runJobs5_6165888.13.err
-        process_id = int(err.split('.')[1])
-        list_all_jobs.append(process_id)
-
-        has_fatal_message = check_err_file(err)
-        has_summary_message = check_err_file(err, 'MessageLogger Summary')
-        if has_summary_message and not has_fatal_message:
-            list_complete.append(process_id)
-            #print err
-
-    list_all_jobs.sort()
-    list_complete.sort()
-    print "[Info] completed jobs: ", list_complete
-
-    # not finished jobs = count only once
-    d = {}
-    for ele in list_all_jobs:
-        d[ele] = 1
-    for ele in list_complete:
-        d[ele] += 1
-
-    list_to_resubmit = []
-    files_to_resubmit = []
-    for key in d.keys():
-        if d[key]==1:
-            list_to_resubmit.append(key)
-            # find out the file if the id(s) are identified
-            for err in err_files:
-                process_id = int(err.split('.')[1])
-                if key == process_id:
-                    files_to_resubmit.append(err)
-                    f.write( err + '\n' )
-
-    tmp_sh = "tmp_job_remove_list.sh"
-    with open(tmp_sh, 'w') as f_tmp:
-        f_tmp.write("#!/bin/bash\n")
-        subprocess.call("chmod +x %s" % tmp_sh, shell = True)
-        for jobId in list_to_resubmit:
-            f_tmp.write("condor_rm %d.%d\n" % (keyword, jobId))
-
-    subprocess.call("vim %s" % tmp_sh, shell = True)
-    print ">>> Remember to remove jobs manually: ./%s" % tmp_sh
-
-def check_submitted_jobs():
-    with open(ongoing_list, 'w') as f:
-        #get_runjob(f, "dir_data_16", 6165888)
-        get_runjob(f, "dir_data_16", 11683455)
-
-    subprocess.call("vim %s" % ongoing_list, shell = True)
-
-    skip = True
-    if not skip:
-        with open(reResubmit_list, 'w') as f:
-            with open(ongoing_list, 'r') as fin:
-                d = {}
-                for line in fin.readlines():
-                    # ex. dir_data_18/runJobs3_9166897.5_htc.log
-                    directory = line.strip().split('/')[0]
-                    runJob = line.strip().split('/')[1].split('_')[0]
-                    ele = directory + "/" + runJob + ".sub"
-                    if ele in d:
-                        d[ele] += 1
-                    else:
-                        d[ele] = 1
-
-                for key in d.keys():
-                    f.write(key + '\n')
-                    print "%s: %d" % (key, d[key])
-
-def create_check_list():
-    command = 'ls -lhrt dir_%s*/*err > %s' % (tag, check_list)
-    subprocess.call(command, shell = True)
-
-    command = 'vim %s' % (check_list)
-    subprocess.call(command, shell = True)
-
-#----------------------------------------------------------------------------------------------------
-
-def check_latest_err_files(year):
+def check_latest_err_files():
     command = 'ls -lhrt dir_%s_%d/*.err > %s' % (tag, year, check_list)
     print command
     subprocess.call(command, shell = True)
@@ -328,48 +242,26 @@ def check_latest_err_files(year):
 
 if __name__ == "__main__":
     subprocess.call("mkdir -p examine", shell = True)
-    #---------- check for the first time ----------#
-    #look_for_fatal_messages()
-    #extract_jobs_to_resubmit(log, False)
-    #extract_jobs_to_resubmit(log, True)
-    #resubmit(resubmit_list, True)
 
-    #---------- check with manual err list ----------#
-    #create_check_list()
-    #look_for_fatal_messages(check_list)
-    #extract_jobs_to_resubmit(log, False)
-    #extract_jobs_to_resubmit(log, True)
-    #resubmit(resubmit_list, False)
-    #resubmit(resubmit_list, True)
+    #---------- main procedure ----------#
+    if args.check_fatal_messages:
+        check_latest_err_files()
+        look_for_fatal_messages(check_list)
+        extract_jobs_to_resubmit(log, False)
 
+    if args.modify_submission_scripts:
+        extract_jobs_to_resubmit(log, True)
+        resubmit(resubmit_list, False)
+
+    if args.exe:
+        resubmit(resubmit_list, True)
+
+    #---------- manual section ----------#
+    #look_for_fatal_messages("examine/check_list.txt")
+    #look_for_fatal_messages("examine/mylist_data_20210704.txt", 'MessageLogger Summary')
+    #extract_jobs_to_resubmit("examine/mylist.txt", False)
+    #extract_jobs_to_resubmit("examine/mylist.txt", True)
     #resubmit('examine/manual_submit.txt', False)
     #resubmit('examine/manual_submit.txt', True)
 
-    #---------- check idle/failed ----------#
-    #check_submitted_jobs()
-    #extract_jobs_to_resubmit(ongoing_list, False)
-    #extract_jobs_to_resubmit(ongoing_list, True)
-    #resubmit(resubmit_list, False)
-    #resubmit(resubmit_list, True)
-
-    #---------- check summary messages ----------#
-    #check_latest_err_files(year)
-    #look_for_fatal_messages(check_list)
-    #extract_jobs_to_resubmit(log, False)
-    #extract_jobs_to_resubmit(log, True)
-    #resubmit(resubmit_list, False)
-    #resubmit(resubmit_list, True)
-
-    #---------- manual section ----------#
-    #extract_jobs_to_resubmit("examine/mylist.txt", False)
-    #extract_jobs_to_resubmit("examine/mylist.txt", True)
-    #resubmit(resubmit_list, False)
-    resubmit(resubmit_list, True)
-
-    #look_for_fatal_messages("examine/mylist_data_20210704.txt", 'MessageLogger Summary')
-    #look_for_fatal_messages("examine/mylist_data_20210704.txt")
     print ">>> finished!"
-
-    #---------- others ----------#
-    #look_for_fatal_messages("examine/check_list.txt")
-    #look_for_fatal_messages("examine/mylist_sig_20210701.txt")
