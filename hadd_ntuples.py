@@ -15,34 +15,39 @@ execution = True
 #----------------------------------------------------------------------------------------------------#
 # v3p5: after including masses in ntuples during consistency check
 #----------------------------------------------------------------------------------------------------#
-global_version = "v3.5"
+global_version = "v3.7"
 target_directory = "/eos/user/y/ykao/tPrimeExcessHgg/rootfiles/ntuples_%s/" % global_version
 
 destinations = {
-    '2016' : 'ntuples_v3p5p1_2016',
-    '2017' : 'ntuples_v3p5p1_2017',
-    '2018' : 'ntuples_v3p5p1_2018',
+    '2016' : 'ntuples_v3p7p6_2016',
+    '2017' : 'ntuples_v3p7p6_2017',
+    '2018' : 'ntuples_v3p7p6_2018',
 }
 
+years = ["2016", "2017", "2018"]
+    
 dirs = [
-    "ntuples_data_2016",
-    "ntuples_data_2017",
-    "ntuples_data_2018",
-    "ntuples_gamma_2016",
-    "ntuples_gamma_2017",
-    "ntuples_gamma_2018",
-    "ntuples_qcdGjet_2016",
-    "ntuples_qcdGjet_2017",
-    "ntuples_qcdGjet_2018",
-    "ntuples_signal_2016",
-    "ntuples_signal_2017",
-    "ntuples_signal_2018",
-    "ntuples_smh_2016",
-    "ntuples_smh_2017",
-    "ntuples_smh_2018",
-    "ntuples_ttX_2016",
-    "ntuples_ttX_2017",
-    "ntuples_ttX_2018",
+    "new_data_2016",
+    "new_data_2017",
+    "new_data_2018",
+    #"ntuples_data_2016",
+    #"ntuples_data_2017",
+    #"ntuples_data_2018",
+    #"ntuples_gamma_2016",
+    #"ntuples_gamma_2017",
+    #"ntuples_gamma_2018",
+    #"ntuples_qcdGjet_2016",
+    #"ntuples_qcdGjet_2017",
+    #"ntuples_qcdGjet_2018",
+    #"ntuples_signal_2016",
+    #"ntuples_signal_2017",
+    #"ntuples_signal_2018",
+    #"ntuples_smh_2016",
+    #"ntuples_smh_2017",
+    #"ntuples_smh_2018",
+    #"ntuples_ttX_2016",
+    #"ntuples_ttX_2017",
+    #"ntuples_ttX_2018",
 ]
 
 #----------------------------------------------------------------------------------------------------#
@@ -135,8 +140,6 @@ def merge_ntuples_1st():
 # 2nd stage of hadd
 #----------------------------------------------------------------------------------------------------#
 
-years = ["2016", "2017", "2018"]
-    
 mysamples = {
         "_bbHToGG"               : "bbH",
         "_VHToGG"                : "VHToGG",
@@ -342,8 +345,11 @@ def merge_ntuples_3rd():
 
 
 if __name__ == "__main__":
-    #merge_ntuples_1st()
-    #merge_ntuples_2nd()
+    if not os.path.exists("merged_ntuples"):
+        subprocess.call("ln -s /eos/user/y/ykao/tPrimeExcessHgg/merged_ntuples merged_ntuples", shell = True)
+
+    merge_ntuples_1st()
+    merge_ntuples_2nd()
     merge_ntuples_3rd()
 
     print "\n>>> Good, this is the end! ;)"

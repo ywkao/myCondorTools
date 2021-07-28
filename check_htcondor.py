@@ -24,8 +24,9 @@ def check_bigbird_machine():
     with open(log, 'w') as f:
         f.write(">>> start checking... \n")
 
-    for num in args.employed:
-        check(str(num))
+    if args.employed != None:
+        for num in args.employed:
+            check(str(num))
 
 def check_machine_status():
     global employed_machines
@@ -83,36 +84,25 @@ def exe_submission():
     #submit("21", "./exe_data_2017.sh")
     #submit("22", "./exe_data_2018.sh")
 
-    #submit("17", "condor_submit dir_data_16/runJobs0.sub")
-    #submit("17", "condor_submit dir_data_16/runJobs1.sub")
-    #submit("17", "condor_submit dir_data_16/runJobs2.sub")
-    #submit("21", "condor_submit dir_data_16/runJobs3.sub")
-    #submit("21", "condor_submit dir_data_16/runJobs4.sub")
-    #submit("11", "condor_submit dir_data_16/runJobs5.sub")
-    #submit("11", "condor_submit dir_data_16/runJobs6.sub")
-
-    #submit("13", "condor_submit dir_data_17/runJobs4.sub")
-    #submit("13", "condor_submit dir_data_17/runJobs5.sub")
-    #submit("13", "condor_submit dir_data_16/runJobs3.sub")
-    #submit("13", "condor_submit dir_data_16/runJobs4.sub")
-
-    #submit("15", "condor_submit dir_data_18/runJobs4.sub")
-    #submit("15", "condor_submit dir_data_18/runJobs5.sub")
-
-    #submit("21", "condor_submit dir_data_17/runJobs1.sub")
-    #submit("21", "condor_submit dir_data_17/runJobs2.sub")
-    #submit("21", "condor_submit dir_data_17/runJobs3.sub")
-
-    #submit("08", "condor_submit ntuples_data_2017/runJobs1.sub")
-    #submit("08", "condor_submit ntuples_data_2017/runJobs5.sub")
-
     #submit("14", "./resubmit_tasks.py")
+
+    #submit("18", "condor_submit ntuples_data_2018/runJobs2.sub")
+    #submit("13", "condor_submit ntuples_data_2018/runJobs3.sub")
+    #submit("13", "condor_submit ntuples_data_2018/runJobs4.sub")
+    #submit("14", "condor_submit ntuples_data_2018/runJobs5.sub")
+
+    submit("23", "condor_submit ntuples_data_2018/runJobs1.sub")
+    #submit("23", "condor_submit ntuples_data_2018/runJobs2.sub")
+    submit("23", "condor_submit ntuples_data_2018/runJobs3.sub")
+    submit("23", "condor_submit ntuples_data_2018/runJobs4.sub")
+    submit("23", "condor_submit ntuples_data_2018/runJobs5.sub")
 
 if __name__ == "__main__":
     if args.monitor:
         check_bigbird_machine() # update employed_machines
         check_machine_status()
-        subprocess.call("vim %s" % log, shell = True)
+        if args.employed != None:
+            subprocess.call("vim %s" % log, shell = True)
 
     if args.exe:
         exe_submission()
