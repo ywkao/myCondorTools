@@ -80,22 +80,19 @@ def exe_submission():
     with open(log, 'w') as f:
         f.write(">>> start submission... \n")
 
-    #submit("20", "./exe_data_2016.sh")
-    #submit("21", "./exe_data_2017.sh")
-    #submit("22", "./exe_data_2018.sh")
+    submit("15", "./exe_data_2018.sh")
+    submit("15", "./exe_data_2017.sh")
+    submit("15", "./exe_data_2016.sh")
 
-    #submit("14", "./resubmit_tasks.py")
 
-    #submit("18", "condor_submit ntuples_data_2018/runJobs2.sub")
-    #submit("13", "condor_submit ntuples_data_2018/runJobs3.sub")
-    #submit("13", "condor_submit ntuples_data_2018/runJobs4.sub")
-    #submit("14", "condor_submit ntuples_data_2018/runJobs5.sub")
+    #submit("12", "condor_submit dir_data_18/runJobs1.sub")
+    #submit("12", "condor_submit dir_data_18/runJobs2.sub")
+    #submit("12", "condor_submit dir_data_18/runJobs3.sub")
+    #submit("12", "condor_submit dir_data_18/runJobs4.sub")
+    #submit("12", "condor_submit dir_data_17/runJobs2.sub")
+    #submit("12", "condor_submit dir_data_17/runJobs0.sub")
+    #submit("12", "condor_submit dir_data_16/runJobs6.sub")
 
-    submit("23", "condor_submit ntuples_data_2018/runJobs1.sub")
-    #submit("23", "condor_submit ntuples_data_2018/runJobs2.sub")
-    submit("23", "condor_submit ntuples_data_2018/runJobs3.sub")
-    submit("23", "condor_submit ntuples_data_2018/runJobs4.sub")
-    submit("23", "condor_submit ntuples_data_2018/runJobs5.sub")
 
 if __name__ == "__main__":
     if args.monitor:
