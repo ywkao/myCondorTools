@@ -22,6 +22,10 @@ sample = "data"
 #subprocess.call("./resubmit_tasks.py --tag %s --year 17 --check_fatal_messages" % sample, shell=True)
 #subprocess.call("./resubmit_tasks.py --tag %s --year 18 --check_fatal_messages" % sample, shell=True)
 
+#subprocess.call("./resubmit_tasks.py --tag %s --year 16 --check_resubmit_list_only" % sample, shell=True)
+#subprocess.call("./resubmit_tasks.py --tag %s --year 17 --check_resubmit_list_only" % sample, shell=True)
+#subprocess.call("./resubmit_tasks.py --tag %s --year 18 --check_resubmit_list_only" % sample, shell=True)
+
 # 3rd step: modify *sh and *sub files
 #subprocess.call("./resubmit_tasks.py --tag %s --year 16 --modify_submission_scripts" % sample, shell=True)
 #subprocess.call("./resubmit_tasks.py --tag %s --year 17 --modify_submission_scripts" % sample, shell=True)
