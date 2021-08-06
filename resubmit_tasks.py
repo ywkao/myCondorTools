@@ -35,7 +35,7 @@ year = args.year
 log = "examine/mylist_%s_%d_%s.txt" % (tag, year, datetime_tag)
 check_list = 'examine/check_list_%s_%d_%s.txt' % (tag, year, datetime_tag)
 resubmit_list = 'examine/latest_resubmit_list_%s_%d_%s.txt' % (tag, year, datetime_tag)
-manual_check_list = 'examine/manual_check_list_%s_%d_%s.txt' % (tag, year, datetime_tag)
+manual_check_list = 'examine/manual_check_list_%s_%d_%s.sh' % (tag, year, datetime_tag)
 
 #----------------------------------------------------------------------------------------------------
 # functions
@@ -69,7 +69,7 @@ def look_for_fatal_messages(txt, keyword = "Fatal"):
                 if has_fatal_message:
                     f.write(target + '\n')
                     with open (manual_check_list, 'a') as f_manual:
-                        f_manual.write(target + '\n')
+                        f_manual.write( "check %s\n" % target )
 
     print ">>> file(s) with fatal messages are here: %s" % log
 
@@ -213,7 +213,11 @@ def check_latest_err_files(extension = 'err'):
 
     if extension == 'err':
         with open (manual_check_list, 'w') as f:
-            f.write("# manual check list\n")
+            f.write("#!/bin/bash\n\n")
+            f.write("function check()\n")
+            f.write("{\n")
+            f.write('   echo "$1: `grep -ic fatal $1`"\n')
+            f.write("}\n")
             f.write("\n# [Info] Error file (automatic re-submitted jobs):\n")
 
     counter = 0
@@ -236,7 +240,7 @@ def check_latest_err_files(extension = 'err'):
                     #d_content[runjob][processId] = line.strip()
                     if extension == 'err':
                         with open (manual_check_list, 'a') as f:
-                            f.write( "%s\n" % line.strip().split()[-1] )
+                            f.write( "check %s\n" % line.strip().split()[-1] )
                 else:
                     d_counter[runjob][processId] = 1
                     d_content[runjob][processId] = line.strip()
@@ -282,7 +286,9 @@ if __name__ == "__main__":
 
         look_for_fatal_messages(check_list)
         extract_jobs_to_resubmit(log, False)
+        subprocess.call("chmod +x %s" % (manual_check_list), shell=True)
         subprocess.call("vim %s" % (manual_check_list), shell=True)
+        subprocess.call("time ./%s" % (manual_check_list), shell=True)
 
     if args.check_resubmit_list_only:
         extract_jobs_to_resubmit(log, False)
