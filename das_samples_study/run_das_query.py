@@ -10,7 +10,7 @@ args = parser.parse_args()
 #}}}
 
 log = "mycheck_gjets.json"
-myfile = "datasets_998.json"
+myfile = "datasets_997.json"
 output = myfile
 datasets = [ #{{{
     "/GJets_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/spigazzi-Era2016_RR-17Jul2018_v2-legacyRun2FullV1-v0-RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2-735d6f5d6752834cf1de64ba6920599a/USER"
@@ -151,8 +151,9 @@ if __name__ == "__main__":
 
     if args.q:
         #search(datasets[0])
-        subprocess.call('dasgoclient --query="dataset=/QCD*DoubleEM*/*/USER instance=prod/phys03"', shell=True)
-        #subprocess.call('dasgoclient --query="dataset=/GJets_HT*madgraphMLM*/spigazzi*/USER instance=prod/phys03"', shell=True)
+        #subprocess.call('dasgoclient --query="dataset=/QCD*/*/USER instance=prod/phys03"', shell=True)
+        subprocess.call('dasgoclient --query="dataset=/GJets_HT*/*/MINIAODSIM"', shell=True)
+        subprocess.call('dasgoclient --query="dataset=/GJets_HT*madgraphMLM*/spigazzi*/USER instance=prod/phys03"', shell=True)
         #subprocess.call('dasgoclient --query="dataset=/GJets_HT*madgraphMLM*/alesauva*/USER instance=prod/phys03"', shell=True)
         #subprocess.call('dasgoclient --query="file dataset=/GJets_HT*madgraphMLM*/spigazzi*Era2016*/USER instance=prod/phys03"', shell=True)
         #subprocess.call('dasgoclient --query="dataset=/GJets_HT*/*Era201*/USER instance=prod/phys03"', shell=True)

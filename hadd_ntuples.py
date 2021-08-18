@@ -15,30 +15,30 @@ execution = True
 #----------------------------------------------------------------------------------------------------#
 # v3p5: after including masses in ntuples during consistency check
 #----------------------------------------------------------------------------------------------------#
-global_version = "v3.7"
+global_version = "v3.8"
 target_directory = "/eos/user/y/ykao/tPrimeExcessHgg/rootfiles/ntuples_%s/" % global_version
 
 destinations = {
-    '2016' : 'ntuples_v3p7p6_2016',
-    '2017' : 'ntuples_v3p7p6_2017',
-    '2018' : 'ntuples_v3p7p6_2018',
+    '2016' : 'ntuples_qcdGjet_v3p8_2016',
+    '2017' : 'ntuples_qcdGjet_v3p8_2017',
+    '2018' : 'ntuples_qcdGjet_v3p8_2018',
 }
 
 years = ["2016", "2017", "2018"]
     
 dirs = [
-    "new_data_2016",
-    "new_data_2017",
-    "new_data_2018",
+    #"new_data_2016",
+    #"new_data_2017",
+    #"new_data_2018",
     #"ntuples_data_2016",
     #"ntuples_data_2017",
     #"ntuples_data_2018",
     #"ntuples_gamma_2016",
     #"ntuples_gamma_2017",
     #"ntuples_gamma_2018",
-    #"ntuples_qcdGjet_2016",
-    #"ntuples_qcdGjet_2017",
-    #"ntuples_qcdGjet_2018",
+    "ntuples_qcdGjet_2016",
+    "ntuples_qcdGjet_2017",
+    "ntuples_qcdGjet_2018",
     #"ntuples_signal_2016",
     #"ntuples_signal_2017",
     #"ntuples_signal_2018",
@@ -238,11 +238,11 @@ def merge_ntuples_2nd():
                     if key in sub:
                         stamp = mysamples[key]
                         if stamp != "Data":
-                            my_rootfile_name = stamp + "_Era" + year + "_%s_%d.root" % (version_stamp, counter)
+                            my_rootfile_name = stamp + "_Era" + year + "_%d.root" % (counter)
                         else:
                             # example: merged_ntuple_DoubleEG_spigazzi-Era2017_RR-31Mar2018_v2-legacyRun2FullV1-v0-Run2017C
                             data_year_stamp = sub.split('-')[5].split('un')[1]
-                            my_rootfile_name = stamp + "_Era" + data_year_stamp + "_%s.root" % version_stamp
+                            my_rootfile_name = stamp + "_Era" + data_year_stamp + ".root"
 
                         has_permission = True
                         print my_rootfile_name
@@ -275,6 +275,8 @@ def merge_ntuples_3rd():
     global target_directory
     os.chdir( target_directory )
     rootfiles = glob.glob("*root")
+    rootfiles = glob.glob("GJet*root")
+    rootfiles = glob.glob("QCD*root")
 
     command_list = []
     collection = {"Data" : {}, "DiPhotonJets" : {}, "GJet_Pt" : {}, "QCD" : {}}
@@ -314,7 +316,7 @@ def merge_ntuples_3rd():
 
         if not need_to_merge:
             new_name = ""
-            reduced_elements = rootfile.split('_')[:-1]
+            reduced_elements = rootfile.split('_')[:-1] # remove idx
             for ele in reduced_elements:
                 if new_name == "":
                     new_name = ele
